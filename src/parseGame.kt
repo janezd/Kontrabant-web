@@ -17,8 +17,7 @@ class Action(val opCode: Int, val param1: Int, val param2: Int, val next: Action
                     else -> 2
                 }
                 return Action(opCode, param1, param2, read(memory, ptr + 1 + nArgs))
-            }
-            else return null
+            } else return null
         }
     }
 }
@@ -44,18 +43,16 @@ class GameData(memory: IntArray) {
             var s = ""
             var actLength = 0
 
-            val colors = arrayOf(
-                    "#000000", "#0000ff", "#ff0000", "#ff00ff",
-                    "#00ff00", "#00ffff", "#ffff00", "#ffffff")
+            val colors = arrayOf("#000", "#00f", "#f00", "#f0f", "#0f0", "#0ff", "#ff0", "#fff")
             val mappedChars = mapOf(
-                    '&' to "&amp;", '<' to "&lt;", '>' to "&gt;", '\u0060' to "&pound;", '\u007f' to "&copy;",
-                    *listOf(
-                        "Ž",
-                        "<span style=\"position:relative\">T<span style=\"position: absolute; left: 0\">ž</span></span>>",
-                        "Č", "đ", "š", "č", "SI", "", "ž", "Ž", "NC", "LA",
-                        "<span style=\"position:relative\">M<span style=\"position: relative; left: -0.4em\">K</span></span>>",
-                        "IR", "ö", "ß", "ž", "ä", "Š", "ć", "ü", "RND", "INKEY$", "PI", "FN ", "POINT "
-                    ).mapIndexed { i, repl -> (i + 0x90).toChar() to repl }.toTypedArray()
+                '&' to "&amp;", '<' to "&lt;", '>' to "&gt;", '\u0060' to "&pound;", '\u007f' to "&copy;",
+                *listOf(
+                    "Ž",
+                    "<span style=\"position:relative\">T<span style=\"position: absolute; left: 0\">ž</span></span>>",
+                    "Č", "đ", "š", "č", "SI", "", "ž", "Ž", "NC", "LA",
+                    "<span style=\"position:relative\">M<span style=\"position: relative; left: -0.4em\">K</span></span>>",
+                    "IR", "ö", "ß", "ž", "ä", "Š", "ć", "ü", "RND", "INKEY$", "PI", "FN ", "POINT "
+                ).mapIndexed { i, repl -> (i + 0x90).toChar() to repl }.toTypedArray()
             )
 
             fun readNext() = memory[ptr++]
@@ -115,7 +112,12 @@ class GameData(memory: IntArray) {
             var ptr = start
             val res = mutableMapOf<String, Int>()
             while (memory[ptr + 4] != 0) {
-                res[memory.slice(ptr..ptr + 3).map { (255 - it).toChar() }.joinToString("").trim()] = memory[ptr + 4]
+                res[memory
+                    .slice(ptr..ptr + 3)
+                    .map { (255 - it).toChar() }
+                    .joinToString("")
+                    .trim()
+                ] = memory[ptr + 4]
                 ptr += 5
             }
             return res
@@ -141,15 +143,16 @@ class GameData(memory: IntArray) {
             fun getWord(i: Int) = if (processes) 255 else memory[ptr + i]
             if (memory[ptr] != 0) {
                 val condAct = getConditionsActions(word(ptr + 2))
-                return Command(getWord(0), getWord(1), condAct.first, condAct.second,
-                        getCommands(ptr + 4, processes))
-            }
-            else return null
+                return Command(
+                    getWord(0), getWord(1), condAct.first, condAct.second,
+                    getCommands(ptr + 4, processes)
+                )
+            } else return null
         }
 
         fun readConnections(pstart: Int, n: Int): Array<Map<Int, Int>> {
             var ptr = word(pstart)
-            return Array(n) dirs@ {
+            return Array(n) dirs@{
                 val dirs = mutableMapOf<Int, Int>()
                 while (memory[ptr] != 0xff) {
                     dirs[memory[ptr]] = memory[ptr + 1]
@@ -160,8 +163,10 @@ class GameData(memory: IntArray) {
             }
         }
 
-        val sign = (16384..memory.size).firstOrNull { ptr -> (1..5).all { memory[ptr + 2 * it] == 16 + it } }
-                ?: throw Exception("Quill signature not found")
+        val sign = (16384..memory.size)
+            .firstOrNull {
+                    ptr -> (1..5).all { memory[ptr + 2 * it] == 16 + it } }
+            ?: throw Exception("Quill signature not found")
 
         val ptr = sign + 13
         nobjectsCarried = memory[ptr]
