@@ -10,8 +10,8 @@ import org.w3c.dom.events.KeyboardEvent
 import parseGame.*
 
 val output = document.getElementById("output")!! as HTMLDivElement
-
 val audioCtx:dynamic = js("new AudioContext()")
+var soundEnabled = true
 
 const val CARRIED = 0xfe
 const val WORN = 0xfd
@@ -97,6 +97,8 @@ fun updateLocation(g: GameState, d: GameData, runProcesses: Boolean, then: () ->
 
 
 fun beep(duration: Int, pitch: Int, then: () -> Unit) {
+    if (duration >= 10 && !soundEnabled)
+        return then()
     val freq = 440 * (1.059463094359).pow(pitch / 2 - 69)
     var oscillator = audioCtx.createOscillator()
     oscillator.type = "square"
@@ -106,7 +108,6 @@ fun beep(duration: Int, pitch: Int, then: () -> Unit) {
     window.setTimeout({
         oscillator.stop()
         then()
-    //}, if (duration <= 10) 10 * duration else duration)
     }, 10 * duration)
 }
 
@@ -316,6 +317,15 @@ fun main(args: Array<String>) {
             inputdiv.setAttribute("style", "visibility: hidden")
             userCommand(command.value, gameState, gameData, enableInput)
         }
+    }
+
+    val speaker: dynamic = document.getElementById("speaker")
+    val lines: dynamic = document.getElementById("lines")
+    speaker.onclick = { event: dynamic ->
+        soundEnabled = !soundEnabled
+        lines.setAttribute("style", if (soundEnabled) "" else "visibility: hidden")
+        event.stopPropagation()
+        event.preventDefault()
     }
 
     updateLocation(gameState, gameData, true, enableInput)
