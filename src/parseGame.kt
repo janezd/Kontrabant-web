@@ -48,10 +48,15 @@ class GameData(memory: IntArray) {
                     "#000000", "#0000ff", "#ff0000", "#ff00ff",
                     "#00ff00", "#00ffff", "#ffff00", "#ffffff")
             val mappedChars = mapOf(
-                    '&' to "&amp;", '<' to "&lt;", '>' to "&gt;",
-                    '\u0060' to "&pound;", '\u007f' to "&copy;",
-                    '\u0095' to "č", '\u0094' to "š", '\u00a0' to "ž",
-                    '\u0092' to "Č", '\u00a2' to "Š", '\u0090' to "Ž")
+                    '&' to "&amp;", '<' to "&lt;", '>' to "&gt;", '\u0060' to "&pound;", '\u007f' to "&copy;",
+                    *listOf(
+                        "Ž",
+                        "<span style=\"position:relative\">T<span style=\"position: absolute; left: 0\">ž</span></span>>",
+                        "Č", "đ", "š", "č", "SI", "", "ž", "Ž", "NC", "LA",
+                        "<span style=\"position:relative\">M<span style=\"position: relative; left: -0.4em\">K</span></span>>",
+                        "IR", "ö", "ß", "ž", "ä", "Š", "ć", "ü", "RND", "INKEY$", "PI", "FN ", "POINT "
+                    ).mapIndexed { i, repl -> (i + 0x90).toChar() to repl }.toTypedArray()
+            )
 
             fun readNext() = memory[ptr++]
 
