@@ -437,6 +437,10 @@ fun main(args: Array<String>) {
             userCommand(command.value, gameState, gameData, ::enableCommands)
         }
     }
+    command.onkeyup = {
+        command.value = command.value.toUpperCase().replace('Č', 'C').replace('Š', 'S').replace('Ž', 'Z')
+        Unit
+    }
 
     val speaker: dynamic = document.getElementById("speaker")
     val lines: dynamic = document.getElementById("lines")
