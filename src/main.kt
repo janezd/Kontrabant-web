@@ -440,6 +440,7 @@ fun main(args: Array<String>) {
         command.value = command.value.toUpperCase().replace('Č', 'C').replace('Š', 'S').replace('Ž', 'Z')
         Unit
     }
+    command.onblur = { command.focus() }
 
     val speaker: dynamic = document.getElementById("speaker")
     val lines: dynamic = document.getElementById("lines")
