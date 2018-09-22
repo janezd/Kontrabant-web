@@ -20,15 +20,24 @@ const val NOT_CREATED = 0xfc
 class GameState(g: GameData) {
     lateinit var objectPositions: MutableList<Int>
     lateinit var flags: Array<Int>
-    var turns = 1
+    var location = 0
 
-    var location: Int
-        get() = flags[2]
-        set(value) { flags[2] = value }
+    val isDark
+        get() = flags[0] != 0
 
-    var nCarried: Int
+    var nCarried
         get() = flags[1]
         set(value) { flags[1] = value }
+
+    val score
+        get() = flags[30]
+
+    var turns
+        get() = flags[31] + 256 * flags[32]
+        set(value) {
+            flags[31] = value % 256
+            flags[32] = value / 256
+        }
 
     init {
         reset(g)
@@ -36,12 +45,18 @@ class GameState(g: GameData) {
 
     fun reset(g: GameData) {
         flags = Array(64) {0}
-        flags[1] = 255
         location = 0
         objectPositions = g.initialObjectPositions.toMutableList()
-        turns = 0
+    }
+
+    fun decreaseFlag(flagNo: Int) {
+        if (flags[flagNo] > 0)
+            flags[flagNo]--
     }
 }
+
+fun objIsPresent(d: GameState, objNo: Int) =
+    d.objectPositions[objNo] in listOf(d.location, WORN, CARRIED)
 
 fun Condition.check(d: GameState) =
     when (opCode) {
@@ -49,18 +64,24 @@ fun Condition.check(d: GameState) =
         1 -> d.location != param1
         2 -> d.location > param1
         3 -> d.location < param1
-        4 -> d.objectPositions[param1] == d.location
-        5 -> d.objectPositions[param1] != d.location
-        6 -> d.objectPositions[param1] == WORN
-        7 -> d.objectPositions[param1] != WORN
-        8 -> d.objectPositions[param1] == CARRIED
-        9 -> d.objectPositions[param1] != CARRIED
+        in 4..9 -> d.objectPositions[param1].let { objPos -> when (opCode) {
+            4 -> objIsPresent(d, param1)
+            5 -> !objIsPresent(d, param1)
+            6 -> objPos == WORN
+            7 -> objPos != WORN
+            8 -> objPos == CARRIED
+            9 -> objPos != CARRIED
+            else -> false
+        }}
         10 -> param1 < 100 * random()
-        11 -> d.flags[param1] == 0
-        12 -> d.flags[param1] != 0
-        13 -> d.flags[param1] == param2
-        14 -> d.flags[param1] < param2
-        15 -> d.flags[param1] > param2
+        in 11..15 -> d.flags[param1].let { flag -> when (opCode) {
+            11 -> flag == 0
+            12 -> flag != 0
+            13 -> flag == param2
+            14 -> flag < param2
+            15 -> flag > param2
+            else -> false
+        }}
         else -> false
     }
 
@@ -88,13 +109,24 @@ fun updateLocation(g: GameState, d: GameData, runProcesses: Boolean, then: () ->
     }
 
     output.innerHTML = ""
-    printOut(d.locations[g.location]) {
-        if (runProcesses)
-            d.processes.process(g, d) {
+    g.decreaseFlag(2)
+    if (g.isDark) {
+        g.decreaseFlag(3)
+        if (!objIsPresent(g, 0))
+            g.decreaseFlag(4)
+        printOut("Temno je kot v rogu.", {
+            if (runProcesses) d.processes.process(g, d, finally={ then() })
+            else then()
+        })
+    } else {
+        printOut(d.locations[g.location]) {
+            if (runProcesses)
+                d.processes.process(g, d) {
+                    printInventory()
+                }
+            else
                 printInventory()
-            }
-        else
-            printInventory()
+        }
     }
 }
 
@@ -161,7 +193,7 @@ fun Action?.execute(g: GameState, d: GameData, then: () -> Unit, done: () -> Uni
         7 -> printOut("Shranjevati pa še ne znam", done)               /* SAVE */
         8 -> printOut("Nalagati pa še ne znam", done)                  /* LOAD */
         9 -> printOut("Ukazov dal si ${g.turns} zares", nextBlock)     /* TURNS */
-        10 -> printOut("Nabral si ${g.flags[30]} točk.", nextBlock)    /* SCORE */
+        10 -> printOut("Nabral si ${g.score} točk.", nextBlock)        /* SCORE */
         11 -> window.setTimeout(nextBlock, 20 * param1)                /* PAUSE */
         12 -> doThis { g.location = param1 }                           /* GOTO */
         13 -> printOut(d.messages[param1], nextBlock)
@@ -287,6 +319,14 @@ fun userCommand(rawText: String, g: GameState, d: GameData, then: () -> Unit) {
     val text = rawText.trim().toUpperCase()
     if (text.isEmpty())
         return then()
+
+    for(flagNo in 5..8)
+        g.decreaseFlag(flagNo)
+    if (g.isDark) {
+        g.decreaseFlag(9)
+        if (!objIsPresent(g, 0))
+            g.decreaseFlag(10)
+    }
 
     printOut("<font color=\"yellow\"/>&gt;&nbsp;$text</font>") print@{
         g.turns++
