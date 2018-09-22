@@ -143,7 +143,7 @@ fun Action?.execute(g: GameState, d: GameData, then: () -> Unit, done: () -> Uni
                     .joinToString("") { "<li>$it</li>"}
                 printOut("Prenašam pa tole: ${
                     if (carrying.isEmpty()) "pravzaprav nič." else "<ul>$carrying</ul>"
-                }", nextBlock)
+                }", done)
             }
         1 -> updateLocation(g, d, false, done)                         /* DESC */
         2 -> { g.reset(d); updateLocation(g, d, true, done) }          /* QUIT */
