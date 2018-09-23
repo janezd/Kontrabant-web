@@ -24,7 +24,7 @@
         }
 
         svg path, svg polygon, svg rect {
-            stroke:#888;
+            stroke:#aaa;
             fill:blue;
             stroke-linecap:round;
             stroke-linejoin:round;
@@ -36,13 +36,26 @@
             stroke:white;
         }
 
+        #info {
+            visibility: hidden;
+            position: fixed;
+            left: 0;
+            top: 0;
+            margin: 20px;
+            border: solid thin white;
+            padding: 10px;
+            background: blue;
+        }
+
+        #info-button:hover ~ #info {
+            visibility: visible;
+        }
     </style>
 </head>
 <body>
 
-<div style="position: fixed; left: 10px; bottom: 10px">
-
-    <svg x="0px" y="0px" width="210px" height="55px" viewBox="16.445 85.14 210 55" xml:space="preserve">
+<div style="position: fixed; left: 10px; top: 10px">
+    <svg x="0px" y="0px" width="105px" height="27px" viewBox="16.445 85.14 210 55" xml:space="preserve">
 	<g id="speaker">
 		<polygon points="51.848,90.485 36.513,103.998 22,103.998 22,121.386 36.294,121.386 51.848,135.094 	"/>
 		<g id="lines">
@@ -81,6 +94,15 @@
 				c-0.887,0-1.857,0.621-2.176,1.392l-10.914,26.392c-0.32,0.771,0.138,1.392,1.024,1.392h37.394c0.886,0,1.857-0.621,2.175-1.392
 				l10.915-26.392c0.319-0.771-0.138-1.392-1.025-1.392H183.178L183.178,103.932z"/>
 		</g></g></svg>
+</div>
+
+<div style="position: fixed; top: 0px; right: 20px">
+    <span id="info-button" style="font-size: 25px; color: #888">&nbsp;&nbsp;&nbsp;i</span>
+    <div id="info">
+        <p>Kontrabant je prva slovenska računalniška igra za ZX Spectrum. Napisala sta jo Žiga Turk in Matevž Kmet leta 1984. Mnogi se še vedno spomnimo na "nosi Svilanit kravate, to te reši iz zagate", pa Kovija Janičiča, Keltske Bistrice, pesnika, ki ves prešeren hodi okrog, Urškinih fantov iz potapljaškega društva... V njej se pojavlja vse iz osemdesetih: HR 84, Attache, licenčni televizorji in utrdba dr. Roglja. Prestolnica domovine je belo mesto vzhodno od Zabrega, za pot čez mejo je potreben potni list, računalnike pa se kupi za marke kupi v Münchnu.</p>
+        <p>Ta stran služi obujanju spominov - na odlično igro, ob kateri smo preživljali mladost, in na norosti iz osemdesetih. Če je tu kdo nov - ali pa, če je kdo pozabil nepozabno - pa naj prebere odlomek spremnega besedila kasete s programom.</p>
+        <p style="padding-left: 20px; font-style: italic">Cilj  igre  je  prinesti  domov  mikroračunalniški  sistem,  torej   televizijo, kasetofon  in  računalnik.  Svetujeva  vam, da  se  najprej  lotite  prvih dveh. Računalnik  bo  treba  pretihotapiti,  kar  je  malo  težje,  toda  gotovo imate izkušnje. Poslušajte  pa nasvete,  ki vam  jih dajejo  prijatelji v  igri. (...) Sintaksa je  normalna, menjave  predmetov z  osebami pa  dosežete takole: SEKIRO MEČ pomeni ZAMENJAJ SEKIRO ZA MEČ</p>
+        <p style="padding-top: 20px;">Kontrabant je bil napisan s programom Quill. Za tole stran sem na novo napisal del, ki izvaja igro, podatke pa brez sprememb prebere iz originala. Igra je karseda enaka originalu - vključno za manjšimi napakami. Šumnike v ukazih ignorira in upošteva le prve štiri črke besede. Da ne bo pretežko, je možno trenutno stanje igre shraniti z ukazom "SHRANI ime datoteke", in ga kasneje naložiti z "NALOŽI". Pa še eni skušnjavi se nisem mogel upreti: možno je preskočiti glasbo na določenih lokacijah.</p>    </div>
 </div>
 
 <input id='fileid' type='file' name='filename' hidden/>
