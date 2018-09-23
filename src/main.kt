@@ -115,8 +115,8 @@ fun Condition.check(d: GameState) =
             11 -> flag == 0
             12 -> flag != 0
             13 -> flag == param2
-            14 -> flag < param2
-            15 -> flag > param2
+            14 -> flag > param2
+            15 -> flag < param2
             else -> false
         }}
         else -> false
