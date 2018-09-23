@@ -188,14 +188,12 @@ fun Action?.execute(g: GameState, d: GameData, then: () -> Unit, done: () -> Uni
     if (this == null)
         return then()
 
-    val anyKey = { block: () -> Unit ->
-        printOut("<span style=\"background-color: red; color: white\">Požgečkaj za nadaljevanje</span>") {
-            document.onkeypress = { event ->
-                event.stopPropagation()
-                event.preventDefault()
-                document.onkeypress = {}
-                block()
-            }
+    val waitKey = { block: () -> Unit ->
+        document.onkeypress = { event ->
+            event.stopPropagation()
+            event.preventDefault()
+            document.onkeypress = {}
+            block()
         }
     }
     val nextBlock = { next.execute(g, d, then, done) }
@@ -223,10 +221,11 @@ fun Action?.execute(g: GameState, d: GameData, then: () -> Unit, done: () -> Uni
         2 -> {
             g.reset(d); updateLocation(g, d, true, done)
         }          /* QUIT */
-        3 -> anyKey { g.reset(d); updateLocation(g, d, true, done) }   /* END */
+        3 -> waitKey { g.reset(d); updateLocation(g, d, true, done) }   /* END */
         4 -> done()                                                    /* DONE */
         5 -> printOut("OK", done)                                      /* OK */
-        6 -> anyKey(nextBlock)                                         /* ANYKEY */
+        6 -> printOut("<span style=\"background-color: red; color: white\">Požgečkaj za nadaljevanje</span>") {
+                waitKey(nextBlock) }                                    /* ANYKEY */
         7 -> g.save("kontrabant", done)                                /* SAVE */
         8 -> g.load { updateLocation(g, d, true, done)}                /* LOAD */
         9 -> printOut("Ukazov dal si ${g.turns} zares", nextBlock)     /* TURNS */
