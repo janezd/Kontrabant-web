@@ -110,7 +110,7 @@ fun Condition.check(d: GameState) =
             9 -> objPos != CARRIED
             else -> false
         }}
-        10 -> param1 < 100 * random()
+        10 -> 100 * random() < param1
         in 11..15 -> d.flags[param1].let { flag -> when (opCode) {
             11 -> flag == 0
             12 -> flag != 0
