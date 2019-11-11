@@ -430,7 +430,7 @@ fun main(args: Array<String>) {
     }
 
     command.onkeypress = {
-        if ((it as KeyboardEvent).charCode == 13) {
+        if ((it as KeyboardEvent).keyCode == 13) {
             preventCommands()
             it.stopPropagation()
             userCommand(command.value, gameState, gameData, ::enableCommands)
